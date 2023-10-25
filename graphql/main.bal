@@ -69,7 +69,6 @@ service /graphql on new graphql:Listener(4000) {
     resource function get createDepartmentObjective(int departmentId, string name, string description, float weight) returns Objective|Error|error {
         mysql:Client dbClient = check new (host = "localhost", user = "root", password = "btsxarmy8", database = "graphQL");
 
-        string insertQuery = "INSERT INTO Objectives(department_id, objective_name, description, weight) VALUES (?, ?, ?, ?)";
         sql:ParameterizedQuery query = `INSERT INTO Objectives(department_id, objective_name, description, weight) VALUES (${departmentId}, ${name}, ${description}, ${weight})`;
 
         var result = dbClient->execute(query);
