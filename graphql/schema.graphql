@@ -1,0 +1,107 @@
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  role: UserRole!
+  department: Department
+}
+
+enum UserRole {
+  EMPLOYEE
+  SUPERVISOR
+  HEAD_OF_DEPARTMENT
+}
+
+type Department {
+  id: ID!
+  name: String!
+  headOfDepartment: User
+  objectives: [Objective!]!
+  users: [User!]! # Represents all users within this department.
+}
+
+type Objective {
+  id: ID!
+  department: Department!
+  name: String!
+  description: String
+  weight: Float!
+  kpis: [KPI!]! # Assuming that KPIs are linked to objectives. If not, remove this.
+}
+
+type KPI {
+  id: ID!
+  employee: User!
+  name: String!
+  description: String
+  weight: Float!
+  unitOfMeasurement: String
+  evaluations: [PerformanceEvaluation!]!
+}
+
+type PerformanceEvaluation {
+  id: ID!
+  employee: User!
+  kpi: KPI!
+  score: Float!
+  overallScore: Float!
+}
+
+type Query {
+  # Fetching single instances
+  user(id: ID!): User
+  department(id: ID!): Department
+  objective(id: ID!): Objective
+  kpi(id: ID!): KPI
+  performanceEvaluation(id: ID!): PerformanceEvaluation
+
+  # Fetching multiple instances
+  users: [User!]!
+  departments: [Department!]!
+  objectives: [Objective!]!
+  kpis: [KPI!]!
+  performanceEvaluations: [PerformanceEvaluation!]!
+}
+
+# Add mutations to create, update, and delete records.
+type Mutation {
+  createUser(
+    name: String!
+    email: String!
+    role: UserRole!
+    departmentId: Int
+  ): User!
+  createDepartmentObjective(
+    departmentId: ID!
+    description: String!
+    percentage: Float!
+  ): Objective!
+  deleteDepartmentObjective(objectiveId: ID!): Boolean!
+  assignEmployeeToSupervisor(employeeId: ID!, supervisorId: ID!): Boolean!
+
+  # ... Additional mutations for Supervisor and Employee
+  approveEmployeeKPI(employeeId: ID!, kpiId: ID!): KPI!
+  deleteEmployeeKPI(kpiId: ID!): Boolean!
+  updateEmployeeKPI(
+    kpiId: ID!
+    description: String
+    metricUnit: MetricUnit
+  ): KPI!
+  gradeEmployeeKPI(kpiId: ID!, score: Float!): KPI!
+  createEmployeeKPI(
+    employeeId: ID!
+    description: String!
+    metricUnit: MetricUnit!
+  ): KPI!
+
+  # Create their KPIs
+  createEmployeeKPI(
+    name: String!
+    description: String
+    weight: Float!
+    unitOfMeasurement: String
+  ): KPI!
+
+  # Grade their supervisor (assuming a new table in MySQL for Supervisor Grades)
+  gradeSupervisor(score: Float!): SupervisorGrade!
+}

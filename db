@@ -1,0 +1,46 @@
+-- Users Table
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    role ENUM('Employee', 'Supervisor', 'Head of Department') NOT NULL,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+-- Departments Table
+CREATE TABLE Departments (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(255) NOT NULL,
+    head_of_department INT,
+    FOREIGN KEY (head_of_department) REFERENCES Users(user_id)
+);
+-- Objectives Table
+CREATE TABLE Objectives (
+    objective_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_id INT NOT NULL,
+    objective_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    weight DECIMAL(5, 2) NOT NULL,
+    -- assuming weight is a decimal value like 25.50 for 25.50%
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+-- KPIs Table
+CREATE TABLE KPIs (
+    kpi_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT NOT NULL,
+    kpi_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    weight DECIMAL(5, 2) NOT NULL,
+    unit_of_measurement VARCHAR(100),
+    FOREIGN KEY (employee_id) REFERENCES Users(user_id)
+);
+-- Performance Evaluations Table
+CREATE TABLE PerformanceEvaluations (
+    evaluation_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT NOT NULL,
+    kpi_id INT NOT NULL,
+    score DECIMAL(5, 2) NOT NULL,
+    overall_score DECIMAL(5, 2) NOT NULL,
+    FOREIGN KEY (employee_id) REFERENCES Users(user_id),
+    FOREIGN KEY (kpi_id) REFERENCES KPIs(kpi_id)
+);
